@@ -56,10 +56,11 @@ uint q001_fast (const uint a, const uint b, uint n) {
 // 2. sum of even Fibonacci numbers
 
 uint q002 (const uint n) {
-	uint sum = 0, fo = 1, f = 1, fn; // F old, F, F new
+	uint sum = 0, fo = 1, f = 1; // F old, F
 	while (f < n) {
 		if(!(f % 2))
 			sum += f;
+		uint fn; // F new
 		fn = f + fo;
 		fo = f;
 		f = fn;
@@ -79,9 +80,10 @@ uint q002_alt (const uint n) { // avoid modulo
 }
 
 uint q002_fast (const uint n) { // even Fibonacci numbers form another sequence
-	uint sum = 0, fo = 0, f = 2, fn; // even: **0**, 1, 1, [2], 3, 5, [8], ... // even: **0** *(imaginary Fibonacci number)*, 1, 1, 
+	uint sum = 0, fo = 0, f = 2; // even: **0**, 1, 1, [2], 3, 5, [8], ... // even: **0** *(imaginary Fibonacci number)*, 1, 1,
 	while (f < n) {
 		sum += f;
+		uint fn; // F new
 		fn = 4 * f + fo; // F = F(n-1) + F(n-2) = 4 * F(n-3) + F(n-6)
 		fo = f;
 		f = fn;
@@ -361,7 +363,7 @@ bool is_prime (const uint p) { // brute force trial division with some optimizat
 }
 
 uint q007 (const uint n) {
-	if (n <= 0)
+	if (n == 0)
 		return 0; // invalid
 	if (n <= 2)
 		return n + 1; // primes: 2, 3, ...
@@ -510,9 +512,10 @@ char* file_to_string (const char* path, const uint len) {
 
 uint q008 (const char* path, const uint len, const uint d) {
 	uint i, j;
-	uint p, max = 0;
+	uint max = 0;
 	char* str = file_to_string(path, len);
 	for (i = 0; i <= len - d; i++) {
+		uint p;
 		p = 1;
 		for (j = 0; j < d; j++)
 			p *= charToInt(str[i + j]);
@@ -644,7 +647,7 @@ int main (int args, char* argv[]) {
 	};
 	uint i, len = sizeof(result) / sizeof(long);
 	for (i = 0; i < len; i++)
-		printf("%i. %ld \n", i+1, result[i]);
+		printf("%u. %ld \n", i+1, result[i]);
 	
 	for (i = 0; i < args; i++) {
 		printf("%s ", argv[i]);
