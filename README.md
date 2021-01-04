@@ -4,6 +4,8 @@ This repository contains my solutions to [Project Euler problem](https://project
 
 The C code was written by November 2014 at the latest. It is mostly intact except for a few fixes (i) for compilation errors and typos in comments; and (ii) to change camel case function names to underscores delimited name phrases.
 
+![Scan of print out of projecteuler.c in 2014](projecteuler.c.jpg)
+
 For each problem, at least one function was written to return the solution to a generalized version of the problem. The parameters given in problem statements were put in function calls in `main()` rather than being hard-coded within the program logic.
 
 For some of the problems solved, a faster or recursive implementation was provided as an alternative to the more straight-forward or naive implementation.
