@@ -2,7 +2,7 @@ CC=gcc
 CFLAGS=
 
 projecteuler:
-	$(CC) $(CFLAGS) -o ./projecteuler ./projecteuler.c
+	$(CC) $(CFLAGS) -lm -o ./projecteuler ./projecteuler.c
 
 run: projecteuler
 	./projecteuler
