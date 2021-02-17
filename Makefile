@@ -1,13 +1,16 @@
-CC=gcc
+CC?=gcc
 CFLAGS=
+LFLAGS=-lm
 
 projecteuler:
-	$(CC) $(CFLAGS) -lm -o ./projecteuler ./projecteuler.c
+	$(CC) $(CFLAGS) -o ./projecteuler ./projecteuler.c $(LFLAGS)
 
 run: projecteuler
 	./projecteuler
 
 clean:
 	rm ./projecteuler
+
+all: projecteuler
 
 .PHONY: all run clean

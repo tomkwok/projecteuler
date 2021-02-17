@@ -1,5 +1,13 @@
 # Project Euler problems solution in C
 
+[![Build status][img_build_status]][build_status] &nbsp; [![Language grade: C/C++][img_lgtm]][lgtm]
+
+[img_build_status]: https://github.com/tomkwok/projecteuler/workflows/projecteuler/badge.svg
+[build_status]: https://github.com/tomkwok/projecteuler/actions?query=branch%3Amaster
+
+[img_lgtm]: https://img.shields.io/lgtm/grade/cpp/g/tomkwok/projecteuler.svg?logo=lgtm&logoWidth=18
+[lgtm]: https://lgtm.com/projects/g/tomkwok/projecteuler/latest/files/
+
 This repository contains my solutions to [Project Euler problem](https://projecteuler.net/archives) 1 to 10 written in C. There is some use of C preprocessor macros in code.
 
 The C code was written by November 2014 at the latest. It is mostly intact except for a few fixes (i) for compilation errors and typos in comments; and (ii) to change camel case function names to underscores delimited name phrases.
@@ -10,7 +18,7 @@ For each problem, at least one function was written to return the solution to a 
 
 For some of the problems solved, a faster or recursive implementation was provided as an alternative to the more straight-forward or naive implementation.
 
-While it is a good exercise to learn C (or any programming language) when trying to solve problems in Project Euler, a cleverer solution is usually derived by doing more mathematics. The C code was annotated with extensive inline comments to explain the methodology of solution with mathematical formulas.
+While it is a good exercise to learn C (or any programming language) when trying to solve problems in Project Euler, a cleverer solution is usually derived by doing some amount of mathematics. The C code was annotated with extensive inline comments to explain the methodology of solution with mathematical formulas.
 
 ## A list of Project Euler problems solved
 
