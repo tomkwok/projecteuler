@@ -1,12 +1,15 @@
 # Project Euler problems solution in C
 
-[![Build status][img_build_status]][build_status] &nbsp; [![Language grade: C/C++][img_lgtm]][lgtm]
+[![Build status][img_build_status]][build_status] [![Language grade: C/C++][img_lgtm]][lgtm] [![Technical debt][img_sonar]][sonar]
 
 [img_build_status]: https://github.com/tomkwok/projecteuler/workflows/projecteuler/badge.svg
 [build_status]: https://github.com/tomkwok/projecteuler/actions?query=branch%3Amaster
 
 [img_lgtm]: https://img.shields.io/lgtm/grade/cpp/g/tomkwok/projecteuler.svg?logo=lgtm&logoWidth=18
 [lgtm]: https://lgtm.com/projects/g/tomkwok/projecteuler/latest/files/
+
+[img_sonar]: https://img.shields.io/sonar/tech_debt/tomkwok_projecteuler?logo=sonarsource&server=https%3A%2F%2Fsonarcloud.io
+[sonar]: https://sonarcloud.io/dashboard?id=tomkwok_projecteuler
 
 This repository contains my solutions to [Project Euler problem](https://projecteuler.net/archives) 1 to 10 written in C. There is some use of C preprocessor macros in code.
 
