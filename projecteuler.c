@@ -1,6 +1,6 @@
 #include <stdio.h> // printf(), FILE, fopen("file", "mode"), fgets(ln, lnlen, fp), fclose(fp), sscanf(src, "format", dest)
 #include <stdlib.h> // malloc(size), calloc(size, sizeof(...))
-#include <string.h> // strcat(dest, src), memcpy(dest, src, size)
+#include <string.h> // memcpy(dest, src, size)
 #include <math.h> // sqrt(), pow(), log(), log10(), floor(), ceil()
 #include <stdint.h>
 #include <stdbool.h> // bool, true, false // GCC: 4-bit / 1-byte
@@ -33,8 +33,8 @@ typedef uint64_t ulong; // GCC: 64-bit / 8-byte (long int)
 // 1. sum of multiples of a or b inclusive
 
 uint q001 (const uint a, const uint b, const uint n) {
-	uint i, sum = 0;
-	for (i = 0; i < n; i++)
+	uint sum = 0;
+	for (uint i = 0; i < n; i++)
 		if (!(i % a) || !(i % b)) // divisible by a or b inclusive
 			sum += i;
 	return sum;
@@ -56,7 +56,7 @@ uint q001_fast (const uint a, const uint b, uint n) {
 // 2. sum of even Fibonacci numbers
 
 uint q002 (const uint n) {
-	uint sum = 0, fo = 1, f = 1; // F old, F
+	uint sum = 0; uint fo = 1; uint f = 1; // F old, F
 	while (f < n) {
 		if(!(f % 2))
 			sum += f;
@@ -69,7 +69,7 @@ uint q002 (const uint n) {
 }
 
 uint q002_alt (const uint n) { // avoid modulo
-	uint sum = 0, a = 1, b = 1, c = a + b; // compilation time optimization
+	uint sum = 0; uint a = 1; uint b = 1; uint c = a + b;
 	while (c < n) {
 		sum += c; // (3n)th number in Fibonacci sequence
 		a = c + b;
@@ -80,7 +80,7 @@ uint q002_alt (const uint n) { // avoid modulo
 }
 
 uint q002_fast (const uint n) { // even Fibonacci numbers form another sequence
-	uint sum = 0, fo = 0, f = 2; // even: **0**, 1, 1, [2], 3, 5, [8], ... // even: **0** *(imaginary Fibonacci number)*, 1, 1,
+	uint sum = 0; uint fo = 0; uint f = 2; // even: **0**, 1, 1, [2], 3, 5, [8], ... // even: **0** *(imaginary Fibonacci number)*, 1, 1,
 	while (f < n) {
 		sum += f;
 		uint fn; // F new
@@ -96,14 +96,10 @@ uint q002_fast (const uint n) { // even Fibonacci numbers form another sequence
 ulong q003 (ulong n) { // prime factorization
 	// this function effectively is primality check (q003r(n) = n indicates n is prime)
 	uint p = 2; // the first prime
-	bool q = 1; // 6k +/- 1 flag, set to true/+1 first [alternative: int q = 1;]
-	while (p <= sqrt(n)) {
+	bool q = 1; // 6k +/- 1 flag, set to true/+1 first [alternative: int q = 1]
+	while (p <= sqrtl(n)) {
 		if (!(n % p)) {
 			return q003(n / p); // recursion, optimized by GCC?
-			//n /= p;
-			//p = 2; // reset
-			//q = 1; // reset
-			continue;
 		}
 		switch (p) { // find the next probable prime
 			case 2:
@@ -113,14 +109,14 @@ ulong q003 (ulong n) { // prime factorization
 				p = 5;
 				break;
 			/* prime after 2, 3, [5] must be in the form of (6k +- 1) since
-			 *  6k is divisible by 2, 3, 6;
-			 *  6k +- 2 is divisible by 2;
+			 *  6k is divisible by 2, 3, 6; and
+			 *  6k +- 2 is divisible by 2; and
 			 *  6k + 3 is divisible by 3.
 			 * even if p is not prime, it is still coprime with n (recursion: n / p)
 			 */
 			default:
-				p += (q ? 2 : 4); // alternative: p += 3 - q;
-				q = !q; // alternative: q = -q;
+				p += (q ? 2 : 4); // alternative: p += 3 - q
+				q = !q; // alternative: q = -q
 		}
 	}
 	return n;
@@ -144,9 +140,9 @@ bool is_palindrome (ulong n) { // avoid overflowing, but slow
 	ulong div = 1;
 	while (n / div >= 10)
 		div *= 10;
-	while (n) {
-		int l = n / div;
-		int r = n % 10;
+	while (n != 0 && div != 0) {
+		ulong l = n / div;
+		ulong r = n % 10;
 		if (l != r)
 			return 0;
 		n = (n % div) / 10; // remove the leftmost and the rightmost digit
@@ -158,27 +154,25 @@ bool is_palindrome (ulong n) { // avoid overflowing, but slow
 /* A number is divisible by 11 if
  * (sum of odd digits - sum of even digits) is divisible by 11,
  * which is the case of any even-digit palindrome.
- * Assume the palindrome product start with 9, according to a multiplication table,
+ * Assume the palindrome product starts with 9, according to a multiplication table,
  * try only {1,9}, {3,3}, {7,7} to get 9 as the last digit of the product.
  */
 
 ulong q004 (const uint d) { // heavily optimized, to be removed
-	// uint c = 0; // iteration counter
-	ulong i, j, p, pmax = 0, maxj;
+	ulong p; ulong pmax = 0; ulong maxj;
 	uint stepj;
-	const ulong min = 9 * pow(10, d - 1); // for both i-loop and j-loop
-	const ulong maxi = pow(10, d) - 1;
+	const ulong min = 9 * (ulong) pow(10, d - 1); // for both i-loop and j-loop
+	const ulong maxi = (ulong) pow(10, d) - 1;
 	
-	for (i = maxi; i > min; i -= 2) {
+	for (ulong i = maxi; i > min; i -= 2) {
 		if (i % 11) { // j is divisible by 11 (5/6 probability in this loop)
-			maxj = i - i % 11; // alternative: maxj = i / 11 * 11;
+			maxj = i - i % 11; // alternative: maxj = i / 11 * 11
 			stepj = 11;
 		} else { // i is divisible by 11 (1/6 probability in this loop)
 			maxj = i;
 			stepj = 2;
 		}
-		for (j = maxj; j > min; j -= stepj) {
-			// c++;
+		for (ulong j = maxj; j > min; j -= stepj) {
 			p = i * j;
 			if (p < pmax)
 				break;
@@ -186,19 +180,18 @@ ulong q004 (const uint d) { // heavily optimized, to be removed
 				pmax = p;
 		}
 	}
-	// printf("q004 c=%d\n", c);
 	return pmax;
 }
 
 ulong q004_fast (const uint d) {
 	uint c = 0; // iteration counter
-	ulong i, j, p, pmax = 0;
-	const ulong pmin = pow(10, d * 2) - pow(10, d * 2 - d / 2); // 990,000
-	const ulong min = pow(10, d) - pow(10, d - d / 2); // 900
-	const ulong max = pow(10, d) - 1; // 999
-	uint i10, j10;
+	ulong p; ulong pmax = 0;
+	const ulong pmin = (ulong) pow(10, d * 2) - (ulong) pow(10, d * 2 - d / 2); // 990,000
+	const ulong min = (ulong) pow(10, d) - (ulong) pow(10, d - d / 2); // 900
+	const ulong max = (ulong) pow(10, d) - 1; // 999
+	uint i10; uint j10;
 	
-	for (i = max - max % 11; i > min; i -= 11) {
+	for (ulong i = max - max % 11; i > min; i -= 11) {
 		c++;
 		if (!(i % 2)) // Skip 2, 4, 6, 8, 0 in the last digit, i.e. even numbers
 			continue;
@@ -215,27 +208,36 @@ ulong q004_fast (const uint d) {
 			default: // 3, 7
 				j10 = i10;
 		}
-		for (j = max - (9 - j10); /* j > min */ ; j -= 10) {
+		for (ulong j = max - (9 - j10); j > min; j -= 10) {
 			c++;
 			p = i * j;
-			//printf("q004_fast p=%ld, i=%ld, j=%ld\n", p, i, j);
+			#ifdef DEBUG
+				printf("q004_fast p=%llu, i=%llu, j=%llu\n", p, i, j);
+			#endif
 			if (p < pmin || p < pmax)
 				break;
 			if (p == reverse_ulong(p))
 				pmax = p;
 		}
 	}
-	//printf("q004_fast d=%d c=%d\n", d, c);
+	#ifdef DEBUG
+		printf("q004_fast d=%d c=%d\n", d, c);
+	#endif
 	return pmax;
 }
 
 // 5. LCM of 1 to n
 
 uint gcdr (const uint a, const uint b) { // greatest common divisor, Euclidean algorithm
-	return b ? gcdr(b, a % b) : a; // recursion // Note: (uint) ? true{>0} : false{0};
+	return b ? gcdr(b, a % b) : a; // recursion // Note: (uint) ? true{>0} : false{0}
 }
 
-uint gcd (uint a, uint b) {
+uint gcd (uint a, uint b) { // assume a and b are not both zero
+	if (a == 0) {
+		return b;
+	} else if (b == 0) {
+		return a;
+	}
 	while (b) {
 		uint t = a % b;
 		a = b;
@@ -246,9 +248,9 @@ uint gcd (uint a, uint b) {
 
 /* Notes on bitwise operations:
  * ((~i) & pow(2, k) - 1) === (!(i % pow(2, k)))
- * (i >> k) === (i / pow(2, k)) // right shift = division
- * (i << k) === (i * pow(2, k)) // left shift = multiplication
- * i >>= __builtin_ctz(i);  is equivalent to  while (!(i & 1)) i >>= 1;
+ * (i >> k) === (i / pow(2, k))   right shift = division
+ * (i << k) === (i * pow(2, k))   left shift = multiplication
+ * i >>= __builtin_ctz(i)  is equivalent to  while (!(i & 1)) i >>= 1
  */
 
 uint gcd2r (const uint a, const uint b) { // binary GCD algorithm or Stein's algorithm, the recursive version
@@ -295,8 +297,8 @@ uint lcm (const uint a, const uint b) {
 }
 
 uint q005 (const uint n) {
-	uint i, r = 1;
-	for (i = 2; i <= n; i++)
+	uint r = 1;
+	for (uint i = 2; i <= n; i++)
 		r = lcm(r, i);
 	return r;
 }
@@ -309,28 +311,27 @@ uint q005r (const uint n) {
 
 uint* prime_esieve (const uint n) {
 	uint* sieve = uintArrayBitCleared(n); // use uint (8-bit) as boolean (1-bit)
-	uint i, j;
-	for (i = 4; i <= n; i += 2)
+	for (uint i = 4; i <= n; i += 2)
 		setBit(sieve, i); // set flag of each (even number > 2) to true
-	for (i = 3; i <= sqrt(n); i += 2)
+	for (uint i = 3; i <= sqrt(n); i += 2)
 		if (!(getBit(sieve, i))) // i is prime
-			for (j = i*i; j <= n; j += 2*i) // Skip i^2+i(k) = i(i+k) where k is odd since (i+k) is even
+			for (uint j = i*i; j <= n; j += 2*i) // Skip i^2+i(k) = i(i+k) where k is odd since (i+k) is even
 				setBit(sieve, j);
 	return sieve;
 }
 
 uint q005_esieve (const uint n) { // n >= 2
 	uint* sieve = prime_esieve(n);
-	uint i, j = 2, p = 1; // j must be > 1
-	for (i = 2; i <= n; i++) { // 1 is not sieved; find the nth primorial (product of the first n primes)
+	uint j = 2; uint p = 1; // j must be > 1
+	for (uint i = 2; i <= n; i++) { // 1 is not sieved; find the nth primorial (product of the first n primes)
 		if (getBit(sieve, i))
 			continue;
 		if (j == 1) {
 			p *= i;
 			continue;
 		}
-		j = log(n) / log(i);
-		p *= pow(i, j);
+		j = (uint) (log(n) / log(i));
+		p *= (uint) pow(i, j);
 	}
 	free(sieve);
 	return p;
@@ -351,12 +352,11 @@ uint q006 (const uint n) {
 // 10. summation of primes: given (max value of primes + 1), find the sum of values
 
 bool is_prime (const uint p) { // brute force trial division with some optimization tricks
-	uint i;
 	if (p <= 3) // 2, 3 are primes
 		return (p > 1); // 1 is not prime; 0 is not a natural number
 	if (!(p % 2) || !(p % 3)) // no even numbers nor multiples of 3
 		return 0;
-	for (i = 5; i <= sqrt(p); i += 6) // 6k +/- 1 from 5 to sqrt(p)
+	for (uint i = 5; i <= sqrt(p); i += 6) // 6k +/- 1 from 5 to sqrt(p)
 		if (!(p % i) || !(p % (i+2)))
 			return 0;
 	return 1;
@@ -369,10 +369,10 @@ uint q007 (const uint n) {
 		return n + 1; // primes: 2, 3, ...
 	uint i = 3; // the 3rd prime is ...
 	uint p = 5; // 5 (p is probable prime)
-	bool q = 1; // 6k +/- 1 flag, set to true/+1 first [alternative: int q = 1;]
+	bool q = 1; // 6k +/- 1 flag, set to true/+1 first [alternative: int q = 1]
 	while (i != n) {
-		p += (q ? 2 : 4); // alternative: p += 3 - q;
-		q = !q; // alternative: q = -q;
+		p += (q ? 2 : 4); // alternative: p += 3 - q
+		q = !q; // alternative: q = -q
 		if (is_prime(p))
 			i++;
 	}
@@ -380,11 +380,10 @@ uint q007 (const uint n) {
 }
 
 bool is_prime_cache (const uint p, const uint* primes) { // trial division with prime numbers stored
-	uint i;
 	if (p <= 1) // 1 is not prime; 0 is not a natural number
 		return 0;
 	// Removed {p = 2, returns true; even number, returns false} logic
-	for (i = 1; primes[i] <= sqrt(p); i++)
+	for (uint i = 1; primes[i] <= sqrt(p); i++)
 		if (!(p % primes[i]))
 			return 0;
 	return 1;
@@ -402,14 +401,13 @@ uint q007_cache (const uint n) { // the first n primes
 	memcpy(primes, primesInit, sizeof(primesInit));
 	
 	uint p = primes[primes[0]]; // 5 (p is probable prime)
-	bool q = 1; // 6k +/- 1 flag, set to true/+1 first [alternative: int q = 1;]
+	bool q = 1; // 6k +/- 1 flag, set to true/+1 first [alternative: int q = 1]
 	while (primes[0] != n) {
-		p += (q ? 2 : 4); // alternative: p += 3 - q;
-		q = !q; // alternative: q = -q;
+		p += (q ? 2 : 4); // alternative: p += 3 - q
+		q = !q; // alternative: q = -q
 		if (is_prime_cache(p, primes))
 			primes[++primes[0]] = p; // also add p to cache
 	}
-	//return primes[primes[0]];
 	free(primes);
 	return p;
 }
@@ -417,9 +415,8 @@ uint q007_cache (const uint n) { // the first n primes
 ulong q010_cache (const uint n) {
 	const uint primesInit[] = { 3, 2, 3, 5 }; // element [0] is the counter, should also be the number of elements - 1
 
-	uint i;
 	ulong sum = 0;
-	for (i = 1; i <= primesInit[0]; i++) {
+	for (uint i = 1; i <= primesInit[0]; i++) {
 		if (primesInit[i] >= n)
 			return sum;
 		sum += primesInit[i];
@@ -429,10 +426,10 @@ ulong q010_cache (const uint n) {
 	memcpy(primes, primesInit, sizeof(primesInit));
 	
 	uint p = primes[primes[0]]; // 5 (p is probable prime)
-	bool q = 1; // 6k +/- 1 flag, set to true/+1 first [alternative: int q = 1;]
+	bool q = 1; // 6k +/- 1 flag, set to true/+1 first [alternative: int q = 1]
 	do {
-		p += (q ? 2 : 4); // alternative: p += 3 - q;
-		q = !q; // alternative: q = -q;
+		p += (q ? 2 : 4); // alternative: p += 3 - q
+		q = !q; // alternative: q = -q
 		if (p >= n)
 			break;
 		if (is_prime_cache(p, primes)) {
@@ -440,8 +437,6 @@ ulong q010_cache (const uint n) {
 			sum += p;
 		}
 	} while (1);
-	//return primes[0];
-	//return primes[primes[0]];
 	free(primes);
 	return sum;
 }
@@ -451,17 +446,16 @@ ulong q010_cache (const uint n) {
 uint* prime_esieve_odd (const uint n) { // 2x 8x memory usage improvement
 	const uint size = (n - 1) / 2;
 	uint* sieve = uintArrayBitCleared(size);
-	uint i, j;
-	for (i = 1; i <= (sqrt(n) - 1) / 2; i++) // index of sqrt(n)
+	for (uint i = 1; i <= (sqrt(n) - 1) / 2; i++) // index of sqrt(n)
 		if (!getBit(sieve, i)) // (2i + 1) is prime
-			for (j = 2*i*(i+1); j <= size; j += 2*i+1) // index of odd numbers squared = (2k+1)^2 = 2 [2i(i+1)] + 1
+			for (uint j = 2*i*(i+1); j <= size; j += 2*i+1) // index of odd numbers squared = (2k+1)^2 = 2 [2i(i+1)] + 1
 				setBit(sieve, j);
 	return sieve;
 }
 
 ulong q010_esieve_odd (const uint n) { // n >= 3
 	uint* sieve = prime_esieve_odd(n);
-	ulong i = 0, p = 1, sum = 2; // 2 is the only even prime
+	ulong i = 0; ulong p = 1; ulong sum = 2; // 2 is the only even prime
 	do {
 		i++;
 		p += 2;
@@ -475,13 +469,13 @@ ulong q010_esieve_odd (const uint n) { // n >= 3
 }
 
 uint q007_esieve_odd (const int n) { // n >= 2
-	uint size;
+	double size;
 	if (n <= 8601) // loser upper bound, error < +20%
 		size = n * (log(n) + log(log(n)));
 	else // tighter upper bound, error < +0.2%
 		size = n * (log(n) + log(log(n)) - 0.9385);
-	uint* sieve = prime_esieve_odd(size);
-	uint i = 0, p = 1, c = 1; // 2 is the first, the only even prime
+	uint* sieve = prime_esieve_odd((uint) size);
+	uint i = 0; uint p = 1; uint c = 1; // 2 is the first, the only even prime
 	do {
 		i++;
 		p += 2;
@@ -497,27 +491,32 @@ uint q007_esieve_odd (const int n) { // n >= 2
 char* file_to_string (const char* path, const uint len) {
 	FILE* fp;
 	const uint lnlen = 80;
-	char ln[lnlen], lns[lnlen];
+	char ln[lnlen];
+	char lnscan[lnlen];
 	char* str = string(len);
 	fp = fopen(path, "r");
 	if (!fp)
 		return str;
+	int lsum = 0;
 	while(fgets(ln, lnlen, fp) != NULL) {
-		sscanf(ln, "%s\n", lns);
-		strcat(str, lns);
+		sscanf(ln, "%s\n", lnscan);
+		lnscan[sizeof(lnscan)-1] = 0;
+		ulong l;
+		l = strlen(lnscan);
+		memcpy(&str[lsum], lnscan, l);
+		lsum += l;
 	}
 	fclose(fp);
 	return str;
 }
 
 uint q008 (const char* path, const uint len, const uint d) {
-	uint i, j;
 	uint max = 0;
-	char* str = file_to_string(path, len);
-	for (i = 0; i <= len - d; i++) {
+	const char* str = file_to_string(path, len);
+	for (uint i = 0; i <= len - d; i++) {
 		uint p;
 		p = 1;
-		for (j = 0; j < d; j++)
+		for (uint j = 0; j < d; j++)
 			p *= charToInt(str[i + j]);
 		if (p > max)
 			max = p;
@@ -526,11 +525,13 @@ uint q008 (const char* path, const uint len, const uint d) {
 }
 
 ulong q008_fast (const char* path, const uint len, const uint d) { // dynamic programming
-	uint i, z = 0; // number of zeros in product
-	ulong p = 1, max = 0;
-	char* str = file_to_string(path, len);
-	for (i = 0; i < len; i++) {
-		// printf("p=%ld, max=%ld, z=%u\n", p, max, z);
+	uint z = 0; // number of zeros in product
+	ulong p = 1; ulong max = 0;
+	const char* str = file_to_string(path, len);
+	for (uint i = 0; i < len; i++) {
+		#ifdef DEBUG
+			printf("q008_fast p=%llu, max=%llu, z=%u\n", p, max, z);
+		#endif
 		if (i+1 > d) { // i [0 .. d - 1]
 			if (str[i - d] == '0')
 				z--;
@@ -550,10 +551,9 @@ ulong q008_fast (const char* path, const uint len, const uint d) { // dynamic pr
 // 9. Pythagorean triplet given perimeter
 
 uint q009 (const uint s) {
-	uint a, b, c;
-	for (a = 3; a <= (s - 3) / 3; a++) { // a + (a+1) + [(a+1) + 1] <= s
-		for (b = a + 1; b <= (s - a - 1) / 2; b++) { // a + b + (b+1) <= s
-			c = s - a - b;
+	for (uint a = 3; a <= (s - 3) / 3; a++) { // a + (a+1) + [(a+1) + 1] <= s
+		for (uint b = a + 1; b <= (s - a - 1) / 2; b++) { // a + b + (b+1) <= s
+			uint c = s - a - b;
 			if (a*a + b*b == c*c)
 				return a * b * c;
 		}
@@ -563,22 +563,22 @@ uint q009 (const uint s) {
 
 uint q009_fast (const uint s) { // s is perimeter which must be even
 	const uint s2 = s / 2; // s = a+b+c = d(2m^2 + 2mn) = 2(d)(m)(m+n) where (n > 0), (m + n > m)
-	uint m, s2m, k, d, n, a, b, c;
-	for (m = 2; m <= sqrt(s); m++) {
+	for (uint m = 2; m <= sqrt(s); m++) {
 		if (!(s2 % m)) { // m is divisible by s/2
-			s2m = s2 / m;
+			uint s2m = s2 / m;
 			s2m >>= __builtin_ctz(s2m); // remove all prime factors 2 (binary: trailing zeros)
+			uint k;
 			if (m & 1) // m is odd
 				k = m + 2; // n is even, k = odd + even = odd
 			else // m is even
 				k = m + 1; // n is odd, k = even + odd = odd
 			while (k < 2*m && k <= s2m) { // (n < m) and (1 <= d)
 				if (!(s2m % k) && gcd(k, m) == 1) { // k is divisible by s/2/m; (m + n) and m coprime
-					d = s2m / k;
-					n = k - m;
-					a = d * (m*m - n*n);
-					b = d * 2 * m * n;
-					c = d * (m*m + n*n);
+					uint d = s2m / k;
+					uint n = k - m;
+					uint a = d * (m*m - n*n);
+					uint b = d * 2 * m * n;
+					uint c = d * (m*m + n*n);
 					return a * b * c;
 				}
 				k += 2;
@@ -597,9 +597,9 @@ uchar* file_to_uchar_2d (const char* path, const uint side) { // 2-digit uint (u
 	fp = fopen(path, "r");
 	if (!fp)
 		return a;
-	uint i, ios = 0;
+	uint ios = 0;
 	while(fgets(ln, lnlen, fp) != NULL) {
-		for (i = 0; i < side; i++) {
+		for (uint i = 0; i < side; i++) {
 			a[ios + i] = 10 * charToInt(ln[3*i]) + charToInt(ln[3*i + 1]);
 		}
 		ios += side;
@@ -627,7 +627,7 @@ int main (int args, char* argv[]) {
 		// 1. sum of multiples of a or b inclusive
 		q001_fast(3, 5, 1000),
 		// 2. sum of even Fibonacci numbers
-		q002_fast(4 * pow(10,6)),
+		q002_fast(4 * (uint) pow(10,6)),
 		// 3. largest prime factor (prime sieve)
 		q003(600851475143),
 		// 4. largest (even-digit) palindrome product of two n-digit numbers
@@ -643,13 +643,13 @@ int main (int args, char* argv[]) {
 		// 9. Pythagorean triplet given perimeter
 		q009_fast(1000),
 		// 10. summation of primes: given (max value of primes + 1), find the sum of values
-		q010_esieve_odd(2 * pow(10,6)),
+		q010_esieve_odd(2 * (uint) pow(10,6)),
 	};
-	uint i, len = sizeof(result) / sizeof(long);
-	for (i = 0; i < len; i++)
+	uint len = sizeof(result) / sizeof(long);
+	for (uint i = 0; i < len; i++)
 		printf("%u. %ld \n", i+1, result[i]);
 	
-	for (i = 0; i < args; i++) {
+	for (uint i = 0; i < args; i++) {
 		printf("%s ", argv[i]);
 	}
 	printf("\n");

@@ -1,5 +1,6 @@
 CC?=gcc
 CFLAGS=
+# CFLAGS=-DDEBUG
 LFLAGS=-lm
 
 projecteuler:
